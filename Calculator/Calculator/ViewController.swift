@@ -9,12 +9,23 @@
 import UIKit
 
 class ViewController: UIViewController {
-
-    @IBOutlet weak var display: UILabel!
     
-    var continueInputing = false
-
-    @IBAction func touchDigit(_ sender: UIButton) {
+    @IBOutlet weak private var display: UILabel!
+    
+    private var continueInputing = false
+    
+    private var brain = CalculatorBrain()
+    
+    private var displayValue: Double {
+        get {
+            return Double(display.text!)!
+        }
+        set {
+            display.text = String(newValue)
+        }
+    }
+    
+    @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         let displayText = display.text!
         
@@ -26,14 +37,16 @@ class ViewController: UIViewController {
         continueInputing = true
     }
     
-    @IBAction func touchOperator(_ sender: UIButton) {
-        continueInputing = false
+    @IBAction private func touchOperator(_ sender: UIButton) {
+        if continueInputing {
+            brain.setOperand(operand: displayValue)
+            continueInputing = false
+        }
         
         if let opr = sender.currentTitle {
-            if opr == "π" {
-                display.text = String(M_PI)
-            }
+            brain.performOperation(symbol: opr)
         }
+        displayValue = brain.result
     }
 }
 
